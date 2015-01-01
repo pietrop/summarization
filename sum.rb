@@ -1,4 +1,6 @@
 require 'rubygems'
+require './rank'
+require 'pp'
 
 def make_sentenses(text)
     words = text.split(/\s+/)
@@ -31,18 +33,17 @@ def score(src_words, dst_words)
 end
 
 def score_sentenses(sentenses)
-    scores = []
+    edges = []
     sentenses.each_with_index do |src_sentense, src_index|
-        scores[src_index] = 0
         sentenses.each_with_index do |dst_sentense, dst_index|
             if src_index != dst_index
-                scores[src_index] += score(src_sentense, dst_sentense)
+                edges << [src_index, dst_index, score(src_sentense, dst_sentense)]
+
             end
         end
     end
-    scores.each_with_index.map do |score, index| 
-        {words: sentenses[index], score: score}
-    end
+    ranker = WeightedPageRank.new(edges)
+    ranker.rank().map{|node, score| {words: sentenses[node], score: score}}
 end
 
 def summarize(text, num_sentenses=5)
