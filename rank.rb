@@ -14,13 +14,14 @@ class WeightedPageRank
     end
 
     def rank()
-        node_count = @edges.map{|e| [e[0], e[1]]}.flatten.uniq.count
         node_info = {}
-        total_weight = {}
+        total_incoming_weight = {}
+        total_weight_sum = 0
 
         @edges.each do |edge|
-            total_weight[edge[0]] ||= 0
-            total_weight[edge[0]]  += edge[2]
+            total_incoming_weight[edge[0]] ||= 0
+            total_incoming_weight[edge[0]]  += edge[2]
+            total_weight_sum += edge[2]
         end
 
         @edges.each do |edge|
@@ -37,21 +38,24 @@ class WeightedPageRank
             node_info[dst][:incoming][src] = weight
         end
 
-        avg_page_rank = 0
-        counter = 0
-        #first conditon only works when all weights are 1.0 and counter is there to break us out if there is infinite loop.
-        while (avg_page_rank*100).to_i < 99 and counter < 100
+        counter   = 100   #get out of infinite loop in odd cases.  
+        err       = 1.0   #track change in err % to total_weight
+        precision = 10000 
+        while (err*precision).to_i > 0 and counter > 0
+            err = 0.0
             node_info.each do |node, info|
                 val = 0
                 if info[:incoming] && info[:incoming].keys.length > 0
                     info[:incoming].each do |inbound_node, weight|
-                        val += node_info[inbound_node][:rank]*weight/total_weight[inbound_node]
+                        val += node_info[inbound_node][:rank]*weight/total_incoming_weight[inbound_node]
                     end
                 end
+                prev_rank = node_info[node][:rank]
                 node_info[node][:rank] = (1-@damping) + @damping*val
+                err += (node_info[node][:rank] - prev_rank).abs
             end
-            avg_page_rank = node_info.map{|n, info| info[:rank]}.inject(:+)/node_count
-            counter += 1
+            err /= total_weight_sum
+            counter -= 1
         end
         Hash[*node_info.map{|node, info| [node, info[:rank]]}.flatten]
     end
@@ -69,7 +73,7 @@ def debug
         ['a', 'c', 1]
     ]
     ranker = WeightedPageRank.new(edges)
-    puts ranker.rank()
+    #puts ranker.rank()
 end
 
 #debug
