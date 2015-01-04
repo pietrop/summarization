@@ -29,8 +29,6 @@ class WeightedPageRank
             dst = edge[1]
             weight = edge[2]*1.0
             node_info[src] ||= {}
-            node_info[src][:outgoing] ||= 0
-            node_info[src][:outgoing]  += weight
             node_info[src][:rank] ||= 1
             node_info[dst] ||= {}
             node_info[dst][:rank] ||= 1
