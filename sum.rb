@@ -43,12 +43,12 @@ def score_sentenses(sentenses)
         end
     end
     ranker = WeightedPageRank.new(edges)
-    ranker.rank().map{|node, score| {words: sentenses[node], score: score}}
+    ranker.rank().map{|node, rank| {words: sentenses[node], rank: rank}}
 end
 
 def summarize(text, num_sentenses=5)
     sentenses = make_sentenses(text)
-    sentenses = score_sentenses(sentenses).sort_by{|s| s[:score]*-1}
+    sentenses = score_sentenses(sentenses).sort_by{|s| s[:rank]*-1}
     puts sentenses.first(num_sentenses).map{|sentense| sentense[:words].join(" ")}.join(" ")
 end
 
