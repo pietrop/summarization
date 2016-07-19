@@ -1,0 +1,17 @@
+GEM
+  remote: https://rubygems.org/
+  specs:
+    nlp-pure (0.1.0)
+    pragmatic_segmenter (0.3.10)
+      unicode
+    unicode (0.4.4.2)
+
+PLATFORMS
+  ruby
+
+DEPENDENCIES
+  nlp-pure
+  pragmatic_segmenter
+
+BUNDLED WITH
+   1.12.5

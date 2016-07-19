@@ -2,23 +2,43 @@ require 'rubygems'
 require './rank'
 require 'pp'
 
+# def make_sentenses(text)
+#     words = text.split(/\s+/)
+#     sentenses = []
+#     sentense  = []
+#     words.each do |word|
+#         sentense << word
+#         if word =~ /(\.|\?)$/
+#             sentenses << sentense
+#             sentense = []
+#         end
+#     end
+#     if sentense.length > 0
+#         sentenses << sentense
+#     end
+#     sentenses.uniq!
+#     sentenses
+# end
+
+##
+# from http://pastebin.com/2kHUBgZb
+##
+require 'nlp_pure/segmenting/default_word'
+require 'pragmatic_segmenter'
+
 def make_sentenses(text)
-    words = text.split(/\s+/)
-    sentenses = []
-    sentense  = []
-    words.each do |word|
-        sentense << word
-        if word =~ /(\.|\?)$/
-            sentenses << sentense 
-            sentense = []
+
+    a = []
+    ps = PragmaticSegmenter::Segmenter.new(text: text)
+    ps.segment.each do |s|
+        each_sentence = NlpPure::Segmenting::DefaultWord.parse s
+        if each_sentence.length > 5
+            a << (NlpPure::Segmenting::DefaultWord.parse s)
         end
     end
-    if sentense.length > 0
-        sentenses << sentense
-    end
-    sentenses.uniq!
-    sentenses
+    a
 end
+
 
 def clean_words(words)
     words.map{|word| word.downcase.gsub(/[^a-z0-9]+/, '')}
